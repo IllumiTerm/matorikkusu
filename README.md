@@ -1,14 +1,14 @@
-# matorikkusu
+## matorikkusu
 
 ![Screenshot from 2023-07-17 12-56-04](https://github.com/IllumiTerm/matorikkusu/assets/69394316/5ed9ee39-cb59-4504-9298-68c3046ddc34)
 
-# Dependencies
+## Dependencies
 
 **pygame: `$ sudo pip3 install pygame==2.1.2`**
 
-#
+##
 
-# Building on Debian, Ubuntu or their derivatives
+## Building on Debian, Ubuntu or their derivatives
 
 **1. Before we continue we will need to install pip3 by executing the following command. `$ sudo apt install python3-pip`**  
 **2. Clone the package. `$ git clone https://github.com/IllumiTerm/matorikkusu.git`**  
