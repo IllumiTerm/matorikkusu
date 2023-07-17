@@ -1,6 +1,6 @@
 # matorikkusu
 
-![Screenshot from 2023-07-16 18-23-26](https://github.com/IllumiTerm/matorikkusu/assets/69394316/f6f64d84-4f0d-4c6a-981f-f4ddf0a5f334)
+![Screenshot from 2023-07-17 12-56-04](https://github.com/IllumiTerm/matorikkusu/assets/69394316/5ed9ee39-cb59-4504-9298-68c3046ddc34)
 
 [![GPL Licence](https://badges.frapsoft.com/os/gpl/gpl-150x33.png?v=103)](https://opensource.org/licenses/GPL-3.0/)
 
