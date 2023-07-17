@@ -4,7 +4,7 @@
 
 # Dependencies
 
-**pygame: $ `sudo pip3 install pygame==2.1.2`**
+**pygame: `$ sudo pip3 install pygame==2.1.2`**
 
 #
 
