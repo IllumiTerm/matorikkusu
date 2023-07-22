@@ -110,10 +110,9 @@ def change_color(key):
         color = colors[key]
 
 
-def main_loop(screen, display, symbols, font, chars):
+def main_loop(screen, display, symbols, font, chars, delay):
     global color
     run = True
-    delay = 0
 
     while run:
         screen.blit(display, (0, 0))
@@ -124,31 +123,45 @@ def main_loop(screen, display, symbols, font, chars):
 
         pygame.time.delay(delay)
         pygame.display.update()
-        pygame.time.Clock().tick(60)
+        pygame.time.Clock().tick(120)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    run = False
-                if event.key == pygame.K_LEFT and delay > 0:
-                    delay -= 15
-                if event.key == pygame.K_RIGHT and delay < 150:
-                    delay += 15
-                if event.key in [
-                    pygame.K_b, pygame.K_c, pygame.K_d, pygame.K_e,
-                    pygame.K_f, pygame.K_g, pygame.K_h, pygame.K_r,
-                    pygame.K_w, pygame.K_y, pygame.K_m, pygame.K_o,
-                    pygame.K_t
-                ]:
-                    change_color(event.key)
-                    for symbol in symbols:
-                        symbol.set_color(color)
+                delay, run = handle_key_event(event, symbols, delay)
 
-                if event.key == pygame.K_p:
-                    pygame.mixer.music.pause()
-                if event.key == pygame.K_u:
-                    pygame.mixer.music.unpause()
+    return delay
+
+
+def handle_key_event(event, symbols, delay):
+    global color
+
+    if event.key == pygame.K_ESCAPE:
+        return delay, False
+
+    if event.key == pygame.K_LEFT and delay > 0:
+        delay -= 15
+
+    if event.key == pygame.K_RIGHT and delay < 150:
+        delay += 15
+
+    if event.key in [
+        pygame.K_b, pygame.K_c, pygame.K_d, pygame.K_e,
+        pygame.K_f, pygame.K_g, pygame.K_h, pygame.K_r,
+        pygame.K_w, pygame.K_y, pygame.K_m, pygame.K_o,
+        pygame.K_t
+    ]:
+        change_color(event.key)
+        for symbol in symbols:
+            symbol.set_color(color)
+
+    if event.key == pygame.K_p:
+        pygame.mixer.music.pause()
+
+    if event.key == pygame.K_u:
+        pygame.mixer.music.unpause()
+
+    return delay, True
 
 
 def main():
@@ -158,8 +171,9 @@ def main():
     screen, display = initialize_display()
     symbols = [Matorikkusu(i, random.randrange(-1020, 0), screen, chars) for i in range(0, 1920, 15 * 2)]
     initialize_audio()
-    main_loop(screen, display, symbols, font, chars)
+    delay = 0
+    delay = main_loop(screen, display, symbols, font, chars, delay)
 
 
 if __name__ == "__main__":
-    main()
+        main()
