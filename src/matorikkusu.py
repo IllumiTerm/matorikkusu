@@ -48,7 +48,7 @@ def initialize_fonts_and_chars(characters):
 
 
 def initialize_display():
-    caption = pygame.display.set_caption('(Matorikkusu)')
+    pygame.display.set_caption('(Matorikkusu)')
     screen = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
     display = pygame.Surface((1920, 1080))
     display.set_alpha(random.randrange(30, 40, 5))
@@ -72,19 +72,17 @@ class Matorikkusu:
     def draw(self):
         char = random.choice(self.chars)
         if self.y < 1080:
-            self.y = self.y + 30
+            self.y += 30
         else:
             self.y = -40 * random.randrange(1, 5)
 
         colored_char = pygame.Surface(char.get_size(), pygame.SRCALPHA)
-
         colored_char.blit(char, (0, 0))
         for y in range(colored_char.get_height()):
             for x in range(colored_char.get_width()):
                 a = colored_char.get_at((x, y))[3]
                 if a > 0:
                     colored_char.set_at((x, y), (*self.color, a))
-
         self.screen.blit(colored_char, (self.x, self.y))
 
     def set_color(self, color):
@@ -117,9 +115,6 @@ def main_loop(screen, display, symbols, font, chars):
     run = True
     delay = 0
 
-    color = (0, 255, 0)
-    change_color(pygame.K_g)
-
     while run:
         screen.blit(display, (0, 0))
         display.fill(pygame.Color('black'))
@@ -135,17 +130,18 @@ def main_loop(screen, display, symbols, font, chars):
                 run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    quit()
+                    run = False
                 if event.key == pygame.K_LEFT and delay > 0:
                     delay -= 15
                 if event.key == pygame.K_RIGHT and delay < 150:
                     delay += 15
-                if event.key in [pygame.K_b, pygame.K_c, pygame.K_d, pygame.K_e,
-                                 pygame.K_f, pygame.K_g, pygame.K_h, pygame.K_r,
-                                 pygame.K_w, pygame.K_y, pygame.K_m, pygame.K_o,
-                                 pygame.K_t]:
+                if event.key in [
+                    pygame.K_b, pygame.K_c, pygame.K_d, pygame.K_e,
+                    pygame.K_f, pygame.K_g, pygame.K_h, pygame.K_r,
+                    pygame.K_w, pygame.K_y, pygame.K_m, pygame.K_o,
+                    pygame.K_t
+                ]:
                     change_color(event.key)
-
                     for symbol in symbols:
                         symbol.set_color(color)
 
@@ -166,4 +162,5 @@ def main():
 
 
 if __name__ == "__main__":
+    color = (0, 255, 0)  # Define the default color
     main()
