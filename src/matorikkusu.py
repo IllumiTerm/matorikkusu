@@ -162,5 +162,4 @@ def main():
 
 
 if __name__ == "__main__":
-    color = (0, 255, 0)  # Define the default color
-    main()
+        main()
