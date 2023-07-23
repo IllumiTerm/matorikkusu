@@ -17,10 +17,7 @@
 import pygame
 import random
 
-
-def initialize_pygame():
-    pygame.init()
-    pygame.mixer.init()
+black = (0, 0, 0)
 
 
 def initialize_characters():
@@ -40,57 +37,80 @@ def initialize_characters():
     ]
 
 
-def initialize_fonts_and_chars(characters):
-    font = pygame.font.Font('../font/MS Mincho.ttf', 35)
-    color = (0, 255, 0)
-    chars = [font.render(char, True, color) for char in characters]
-    return font, chars
+def load_font(font_path, size):
+    return pygame.font.Font(font_path, size)
 
 
 def initialize_display():
-    pygame.display.set_caption('(Matorikkusu)')
-    screen = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
-    display = pygame.Surface((1920, 1080))
-    display.set_alpha(random.randrange(30, 40, 5))
-    pygame.display.set_icon(pygame.image.load('../logo/logo.png'))
-    return screen, display
-
-
-def initialize_audio():
-    pygame.mixer.music.load('../audio/audio.wav')
-    pygame.mixer.music.play(loops=-1)
+    pygame.display.set_caption('Matorikkusu')
+    return pygame.display.set_mode((1080, 1920), pygame.RESIZABLE)
 
 
 class Matorikkusu:
-    def __init__(self, x, y, screen, chars):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.screen = screen
-        self.chars = chars
         self.color = (0, 255, 0)
+        self.chars = initialize_characters()
+        self.char_size = 36
+        self.line_length = random.randint(10, 20)
+        self.line = [random.choice(self.chars) for _ in range(self.line_length)]
+        self.vertical_step = 10
+        self.alpha = 255
+        self.trail_length = 4
+        self.trail = []
 
-    def draw(self):
-        char = random.choice(self.chars)
-        if self.y < 1080:
-            self.y += 30
+    def draw(self, screen):
+        if self.y < 1920:
+            self.y += self.vertical_step * (self.line_length / 20)
+            distance_to_bottom = 1920 - self.y
+            fade_range = 200
+
+            if distance_to_bottom < fade_range:
+                self.alpha = int((distance_to_bottom / fade_range) * 255)
+
+            self.trail.append((self.x, self.y))
+
+            if len(self.trail) > self.trail_length:
+                self.trail.pop(0)
+
+            for i in range(self.line_length):
+                if random.random() < 0.02:
+                    self.line[i] = random.choice(self.chars)
+
         else:
             self.y = -40 * random.randrange(1, 5)
+            self.alpha = 255
+            self.trail = []
 
-        colored_char = pygame.Surface(char.get_size(), pygame.SRCALPHA)
-        colored_char.blit(char, (0, 0))
-        for y in range(colored_char.get_height()):
-            for x in range(colored_char.get_width()):
-                a = colored_char.get_at((x, y))[3]
-                if a > 0:
-                    colored_char.set_at((x, y), (*self.color, a))
-        self.screen.blit(colored_char, (self.x, self.y))
+        char_font = load_font('../font/MS Mincho.ttf', self.char_size)
+
+        for i, char in enumerate(self.line):
+            char_surface = char_font.render(char, True, self.color)
+            fade_distance = 1920 - self.y - i * 30
+            if fade_distance < 0:
+                fade_distance = 0
+            fade_alpha = int((1 - fade_distance / 1920) * self.alpha)
+            char_surface.set_alpha(fade_alpha)
+            screen.blit(char_surface, (self.x, self.y + i * 30))
+
+            for j, trail_pos in enumerate(reversed(self.trail)):
+                trail_alpha = int((1 - j / self.trail_length) * fade_alpha)
+                trail_surface = char_font.render(char, True, self.color)
+                trail_surface.set_alpha(trail_alpha)
+                screen.blit(trail_surface, (trail_pos[0], trail_pos[1] + i * 30))
 
     def set_color(self, color):
         self.color = color
 
+    def decrease_speed(self):
+        self.vertical_step = max(self.vertical_step - 5, 5)
+
+    def increase_speed(self):
+        self.vertical_step = min(self.vertical_step + 5, 100)
+
 
 def change_color(key):
-    global color
     colors = {
         pygame.K_b: (0, 0, 255),
         pygame.K_c: (0, 255, 255),
@@ -107,73 +127,69 @@ def change_color(key):
         pygame.K_t: (0, 128, 128),
     }
     if key in colors:
-        color = colors[key]
-
-
-def main_loop(screen, display, symbols, font, chars, delay):
-    global color
-    run = True
-
-    while run:
-        screen.blit(display, (0, 0))
-        display.fill(pygame.Color('black'))
-
-        for symbol in symbols:
-            symbol.draw()
-
-        pygame.time.delay(delay)
-        pygame.display.update()
-        pygame.time.Clock().tick(120)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                delay, run = handle_key_event(event, symbols, delay)
-
-    return delay
-
-
-def handle_key_event(event, symbols, delay):
-    global color
-
-    if event.key == pygame.K_ESCAPE:
-        return delay, False
-
-    if event.key == pygame.K_LEFT and delay > 0:
-        delay -= 15
-
-    if event.key == pygame.K_RIGHT and delay < 150:
-        delay += 15
-
-    if event.key in [
-        pygame.K_b, pygame.K_c, pygame.K_d, pygame.K_e,
-        pygame.K_f, pygame.K_g, pygame.K_h, pygame.K_r,
-        pygame.K_w, pygame.K_y, pygame.K_m, pygame.K_o,
-        pygame.K_t
-    ]:
-        change_color(event.key)
-        for symbol in symbols:
-            symbol.set_color(color)
-
-    if event.key == pygame.K_p:
-        pygame.mixer.music.pause()
-
-    if event.key == pygame.K_u:
-        pygame.mixer.music.unpause()
-
-    return delay, True
+        return colors[key]
+    else:
+        return None
 
 
 def main():
-    initialize_pygame()
-    characters = initialize_characters()
-    font, chars = initialize_fonts_and_chars(characters)
-    screen, display = initialize_display()
-    symbols = [Matorikkusu(i, random.randrange(-1020, 0), screen, chars) for i in range(0, 1920, 15 * 2)]
-    initialize_audio()
-    delay = 0
-    delay = main_loop(screen, display, symbols, font, chars, delay)
+    pygame.init()
+
+    custom_font = load_font('../font/MS Mincho.ttf', 24)
+
+    window = initialize_display()
+
+    icon = pygame.image.load('../logo/logo.png')
+    pygame.display.set_icon(icon)
+
+    pygame.mixer.init()
+
+    audio = pygame.mixer.Sound('../audio/audio.wav')
+    audio.play(-1)
+
+    music_muted = False
+
+    matrix_symbols = [Matorikkusu(x, random.randint(0, 1920)) for x in range(0, 1080, 30)]
+
+    clock = pygame.time.Clock()
+    running = True
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_LEFT:
+                    for symbol in matrix_symbols:
+                        symbol.decrease_speed()
+                elif event.key == pygame.K_RIGHT:
+                    for symbol in matrix_symbols:
+                        symbol.increase_speed()
+                elif event.key == pygame.K_p:
+                    pygame.mixer.pause()
+                    music_muted = True
+                elif event.key == pygame.K_u:
+                    pygame.mixer.unpause()
+                    music_muted = False
+                else:
+                    new_color = change_color(event.key)
+                    if new_color:
+                        for symbol in matrix_symbols:
+                            symbol.set_color(new_color)
+
+        window.fill(black)
+
+        for symbol in matrix_symbols:
+            symbol.draw(window)
+
+        pygame.display.flip()
+        clock.tick(60)
+
+    pygame.mixer.stop()
+    pygame.quit()
 
 
 if __name__ == "__main__":
-        main()
+    main()
