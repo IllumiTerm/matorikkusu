@@ -1,4 +1,4 @@
-## matorikkusu
+<h2 align="center">Matorikkusu</h2>
 
 ![Screenshot from 2023-07-17 12-56-04](https://github.com/IllumiTerm/matorikkusu/assets/69394316/5ed9ee39-cb59-4504-9298-68c3046ddc34)
 
