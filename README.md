@@ -4,7 +4,7 @@
 
 ##
 
-## Building on Debian, Ubuntu or their derivatives
+## Installing on Debian, Ubuntu or their derivatives
 
 **1. Before we continue we will need to install pip3 by executing the following command. `$ sudo apt install python3-pip`**  
 **2. Clone the package. `$ git clone https://github.com/IllumiTerm/matorikkusu.git`**  
